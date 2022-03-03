@@ -4,7 +4,7 @@
 <h2>Formulario</h2>
 <form action="recibir.php" method="POST" enctype="multipart/form-data">
 
-    <label for="nombre">Nombre:
+    <label for="nombre">Nombre: 
         <input type="text" name="nombre" class="form-control" />
     </label>
 
