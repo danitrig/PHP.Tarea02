@@ -7,7 +7,6 @@ $errors = array();
 $mensajeResultado = "";
 $mensajeConsulta = "";
 
-
 function mostrarErrores($errors, $campo) {
 	if (isset($errors[$campo]) && !empty($campo)) {
 		$alert = '<div class="alert alert-danger">' . $errors[$campo] . '</div>';
@@ -19,7 +18,7 @@ function mostrarErrores($errors, $campo) {
 
 function mantenerValores($datosUsuario, $campo, $textarea = false) {
 	if (isset($datosUsuario) && count($datosUsuario) > 0) {
-		if ($textarea != false) {
+		if ($textarea == true) {
 			echo $datosUsuario[$campo];
 		} else {
 			echo "value='{$datosUsuario[$campo]}'";
@@ -31,7 +30,7 @@ function mantenerValores($datosUsuario, $campo, $textarea = false) {
 //comprobamos que existe, que no está vacío y que es un número. Si no se cumple
 //volvemos al listado.
 if (!isset($idusuario) || empty($idusuario) || !is_numeric($idusuario)) {
-	//header("Location:listuser.php");
+	header("Location:listuser.php");
 }
 
 try {
@@ -41,7 +40,7 @@ try {
 
 	if ($resultsquery) {
 		$mensajeConsulta = '<div class="alert alert-success">' .
-				"La consulta se realizó correctamente." . '</div>';
+				"Se obtuvieron los datos correctamente." . '</div>';
 		$usuarioEditar = $resultsquery->fetch();
 		if (!isset($usuarioEditar["idusuario"]) || empty($usuarioEditar["idusuario"])) {
 			header("Location:listuser.php");
@@ -49,7 +48,7 @@ try {
 	}
 } catch (PDOException $ex) {
 	$mensajeConsulta = '<div class="alert alert-danger">' .
-			"La consulta no se realizó correctamente." . '</div>';
+			"No se obtuvieron los datos." . '</div>';
 	die();
 }
 echo $mensajeConsulta;
@@ -104,6 +103,8 @@ if (isset($_POST["submit"])) {
 
 	if (!empty($_POST["password"]) && strlen($_POST["password"]) >= 6) {
 		$password_validate = true;
+	} elseif (empty($_POST["password"])) {
+		$password_validate = true;
 	} else {
 		$password_validate = false;
 
@@ -130,7 +131,11 @@ if (count($errors) == 0 && isset($_POST['submit'])) {
 	$apellidos = filter_var($_POST["apellidos"], FILTER_SANITIZE_STRING);
 	$biografia = filter_var($_POST["biografia"], FILTER_SANITIZE_STRING);
 	$email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-	$password = sha1($_POST['password']); //sha1 se usa para encriptar , como seguridad
+	if (empty($_POST["password"])) {
+		$password = $usuarioEditar["password"];
+	} else {
+		$password = sha1($_POST['password']); //sha1 se usa para encriptar , como seguridad
+	}
 	$image = $_FILES["image"];
 
 	//Instrucción SQL parametrizada
@@ -138,12 +143,11 @@ if (count($errors) == 0 && isset($_POST['submit'])) {
 		//Definición
 		$sql = "UPDATE usuarios SET nombre= :nombre, apellidos=:apellidos, biografia=:biografia, email= :email, password= :password,image= :image WHERE idusuario= :idusuario";
 
-		echo $sql;
-		die();
 		//Preparación
 		$query = $conexion->prepare($sql);
 		//Ejecución
 		$query->execute([
+			'idusuario' => $idusuario,
 			'nombre' => $nombre,
 			'apellidos' => $apellidos,
 			'biografia' => $biografia,
@@ -151,12 +155,13 @@ if (count($errors) == 0 && isset($_POST['submit'])) {
 			'password' => $password,
 			'image' => "probando"
 		]);
+
 		//Si se realiza correctamente mostrará un mensaje satisfactorio.
 		if ($query) {
-			$mensajeResultado = '<div class="alert alert-success">' . "REGISTRO REALIZADO CORRECTAMENTE" . '</div>';
+			$mensajeResultado = '<div class="alert alert-success">' . "EDICIÓN REALIZADA CORRECTAMENTE" . '</div>';
 		}//Si no se inserta mostrará un mensaje de error.
 	} catch (PDOException $ex) {
-		$mensajeResultado = '<div class="alert alert-success">' . "ALGO SALIÓ MAL AL REGISTRARSE" . '</div>';
+		$mensajeResultado = '<div class="alert alert-danger">' . "ALGO SALIÓ MAL AL EDITAR" . '</div>';
 		die();
 	}
 }
@@ -169,8 +174,7 @@ echo $mensajeResultado;
 	" " . $usuarioEditar["apellidos"];
 	?>
 </h2>
-<form action="edit.php" method="POST" enctype="multipart/form-data">
-
+<form action="" method="POST" enctype="multipart/form-data">
 	<!-- Nombre -->
     <label for="nombre">Nombre:
         <input type="text" name="nombre" class="form-control" 
@@ -215,9 +219,7 @@ echo $mensajeResultado;
     </br>
 
     <input type="submit" value="Editar" name="submit" class="btn btn-success" />
-	<a href="listuser.php" class="btn btn-danger">Calcelar</a>
-
-
+	<a href="listuser.php" class="btn btn-danger">Volver</a>
 
 </form>
 
