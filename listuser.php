@@ -6,8 +6,37 @@ $mensajeResultado = "";
 // Primero hacemos la consulta
 try {
 	$sql = "SELECT * FROM usuarios";
-// Ejecutamos (conexion es el nombre de la conexión a la base de datos)
+	// Ejecutamos (conexion es el nombre de la conexión a la base de datos)
 	$resultsquery = $conexion->query($sql);
+
+	//Para realizar la paginación primero vemos cuantos ususarios tenemos en el registro.
+	$numeroUsuarios = $conexion->query("SELECT FOUND_ROWS() as total");
+	$numeroUsuarios = $numeroUsuarios->fetch()['total'];
+
+	if ($numeroUsuarios > 0) {
+		$usuariosPorPagina = 3; //Para no tener que introducir muchos usuarios y probar que funciona he puesto solo 3
+
+		if (isset($_GET["pagina"])) {
+			$pagina = $_GET["pagina"];
+		} else {
+			$pagina = 0;
+		}
+		//Si solo tiene una página
+		if ($pagina == 0) {
+			$start = 0;
+			$pagina = 1;
+		} else {
+			$start = ($pagina - 1) * $usuariosPorPagina;
+		}
+		$paginasTotales = ceil($numeroUsuarios / $usuariosPorPagina);
+
+		$sql = "SELECT * FROM usuarios order by idusuario DESC LIMIT {$start}, {$usuariosPorPagina};";
+		$resultsquery = $conexion->query($sql);
+	} else {
+		echo'<div class="alert alert-danger">' .
+		"Aún NO existe ningún usuario" . '</div>';
+	}
+
 //Revisamos OJO Preguntar por qué query
 	if ($resultsquery) {
 		$mensajeResultado = '<div class="alert alert-success">' .
@@ -44,7 +73,7 @@ try {
 					<td><?= $fila["email"] ?> </td>			
 					<td><?php
 						if ($fila["image"] != null) {
-							echo '<img src="uploads/'.$fila["image"].'" width="60" />'. $fila['image'];
+							echo '<img src="uploads/' . $fila["image"] . '" width="60" />' . $fila['image'];
 						}
 						?>
 					</td>
@@ -54,8 +83,35 @@ try {
 						<a href="delete.php?idusuario=<?= $fila['idusuario'] ?>" class="btn btn-danger">Eliminar</a>
 					</td>
 				</tr>
-<?php } ?>
+			<?php } ?>
 		</table>
+		<?php if ($numeroUsuarios > 0) { ?>
+			<!--Usamos la paginación de boopstrap-->
+			<ul class="pagination">
+				<?php
+				if ($pagina == 1) {
+					echo '<li><a class="page-link"><</a></li>';
+				} else {
+					echo '<li><a class="page-link" href="?pagina=' . ($pagina - 1) . '"><</a></li>';
+				}
+
+				for ($i = 1; $i <= $paginasTotales; $i++) {
+
+					if ($pagina == $i) {
+						echo '<li><a class="page-link">' . $i . '</a></li>';
+					} else {
+						echo '<li><a class="page-link" href="?pagina=' . $i . '">' . $i . '</a></li>';
+					}
+				}
+				if ($pagina == $paginasTotales) {
+					echo '<li><a class="page-link">></a></li>';
+				} else {
+					echo '<li><a class="page-link" href="?pagina=' . ($pagina + 1) . '">></a></li>';
+				}
+				?>
+			</ul>
+		<?php } ?>
+
 	</div>
 </body>
 </html>
