@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: dockerfile
+    container_name: PHPTarea02
+    restart: always
+    ports:
+       - 8080:80
+    volumes:
+      - ./PHPTarea02:/var/www/PHPTarea02
+volumes:
+  PHPTarea02: {}
+
+
+
+        

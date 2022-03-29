@@ -55,7 +55,9 @@ try {
 		<div class="container cuerpo text-left">
 			<p><h2><img class="alineadoTextoImagen" src= "images/user.png"width="50px"/>
 				Base de Datos de Usuarios</h2></p>
+			<a href="pdf.php" class="btn btn-primary">Imprimir PDF</a>
 		</div>
+		</br>
 		<?php echo $mensajeResultado ?>
 		<table class="table table-striped">
 			<tr>
@@ -73,7 +75,7 @@ try {
 					<td><?= $fila["email"] ?> </td>			
 					<td><?php
 						if ($fila["image"] != null) {
-							echo '<img src="uploads/' . $fila["image"] . '" width="60" />' . $fila['image'];
+							echo '<img src="uploads/' . $fila["image"] . '" width="60" /></br>' . $fila['image'];
 						}
 						?>
 					</td>

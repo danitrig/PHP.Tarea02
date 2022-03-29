@@ -2,7 +2,7 @@
 //En este archivo crearemos la tabla usuarios en la base de datos bdusuarios
 
 //Aquí accedemos al archivo para conectarnos a la base de datos
-require_once './includes/connect.php';
+require_once 'connect.php';
 
 try {
 	$crearTablaUsuarios = "CREATE TABLE IF NOT EXISTS usuarios(

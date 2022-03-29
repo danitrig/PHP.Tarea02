@@ -1,41 +1,15 @@
 <?php require 'includes/header.php' ?>
 
+<body class="cuerpo">
+	<div class="container centrar">
+		<div class="container cuerpo text-left">
+			<p><h2><img class="alineadoTextoImagen" src= "images/user.png"width="50px"/>
+				Base de Datos de Usuarios</h2> </p>
+		</div>
+		<ul>
+			<li> <a href="listuser.php">Listar usuarios</a> </li>
+			<li> <a href="adduser.php">Añadir usuario</a> </li>		
 
-<h2>Formulario</h2>
-<form action="recibir.php" method="POST" enctype="multipart/form-data">
+		</ul>
 
-    <label for="nombre">Nombre: 
-        <input type="text" name="nombre" class="form-control" />
-    </label>
-
-    <label for="apellidos">Apellidos: 
-        <input type="text" name="apellidos" class="form-control" />
-    </label>
-    </br>
-
-    <label for="biografia">Biografía:
-        <textarea name="biografia" class="form-control"></textarea>
-    </label>
-    </br>
-
-    <label for="email">Correo Electrónico:
-        <input type="email" name="email" class="form-control" />
-    </label>
-    </br>
-
-    <label for="password">Contraseña:
-        <input type="password" name="password" class="form-control" />
-    </label>
-    </br>
-
-    <label for="image">Imagen:
-        <input type="file" name="image" class="form-control" />
-    </label>
-    </br>
-
-    <input type="submit" value="Enviar" name="submit" class="btn btn-success" />
-
-
-</form>
-
-<?php require 'includes/footer.php'; ?>
+		<?php require 'includes/footer.php'; ?>

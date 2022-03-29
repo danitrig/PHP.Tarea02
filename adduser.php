@@ -80,6 +80,7 @@ if (isset($_POST["submit"])) {
 		$errors["password"] = "La contraseña introducida no es válida.";
 	}
 
+	$image = null;
 	if (isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])) {
 
 		//Comprobamos si existe el directorio upload, sino existe lo creamos así.
@@ -92,7 +93,7 @@ if (isset($_POST["submit"])) {
 			$image = time() . " - " . $_FILES["image"]["name"];
 			//Con esto movemos el fichero que tenemos en la carpeta temporal a la ruta que especificamos.
 			$mover = move_uploaded_file($_FILES["image"]["tmp_name"], "uploads/" . $image);
-			
+
 			if ($mover) {
 				$image_validate = true;
 			} else {

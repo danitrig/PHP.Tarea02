@@ -32,7 +32,12 @@ try {
 }
 echo $mensajeResultado;
 ?>
-
+<?php
+if ($usuarioMostrar["image"] != null) {
+	echo '<h5>Imagen de perfil: </h5>';
+	?>
+	<img src="uploads/<?php echo $usuarioMostrar["image"] ?>" width="150" />
+<?php } ?>
 <h5>Nombre:</h5>
 <a><?php echo $usuarioMostrar["nombre"] ?> </a>
 <h5>Apellidos:</h5>

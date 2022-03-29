@@ -111,13 +111,29 @@ if (isset($_POST["submit"])) {
 		$errors["password"] = "La contraseña introducida no es válida.";
 	}
 
+	//Guardamos temporalmente la imagen que ya teníamos del usuario con la ID seleccionada, si no tenía guardará NULL
+	$image = $usuarioEditar["image"];
+
 	if (isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])) {
 
-//		$image_validate = true;
-//	} else {
-//		$image_validate = false;
-//		
-//		$errors["image"] = "La imagen introducida no es válida.";
+		//Comprobamos si existe el directorio upload, sino existe lo creamos así.
+		if (!is_dir("uploads")) {
+			$dir = mkdir("uploads", 0777, true);
+		}//Si existe el directorio movemos el archivo a ese directorio.
+		else {
+			//Le pasamos el nombre por defecto y le concatenamos time() para que no
+			//sobreescriba el archivo si subimos una imagen con el mismo nombre.
+			$image = time() . " - " . $_FILES["image"]["name"];
+			//Con esto movemos el fichero que tenemos en la carpeta temporal a la ruta que especificamos.
+			$mover = move_uploaded_file($_FILES["image"]["tmp_name"], "uploads/" . $image);
+
+			if ($mover) {
+				$image_validate = true;
+			} else {
+				$image_validate = false;
+				$errors["image"] = "La imagen introducida no es válida.";
+			}
+		}
 	}
 }
 
@@ -131,12 +147,12 @@ if (count($errors) == 0 && isset($_POST['submit'])) {
 	$apellidos = filter_var($_POST["apellidos"], FILTER_SANITIZE_STRING);
 	$biografia = filter_var($_POST["biografia"], FILTER_SANITIZE_STRING);
 	$email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+	//Si la contraseña o la imagen está vacía se queda la que estaba.
 	if (empty($_POST["password"])) {
 		$password = $usuarioEditar["password"];
 	} else {
 		$password = sha1($_POST['password']); //sha1 se usa para encriptar , como seguridad
 	}
-	$image = $_FILES["image"];
 
 	//Instrucción SQL parametrizada
 	try {
@@ -153,12 +169,17 @@ if (count($errors) == 0 && isset($_POST['submit'])) {
 			'biografia' => $biografia,
 			'email' => $email,
 			'password' => $password,
-			'image' => "probando"
+			'image' => $image
 		]);
 
 		//Si se realiza correctamente mostrará un mensaje satisfactorio.
 		if ($query) {
 			$mensajeResultado = '<div class="alert alert-success">' . "EDICIÓN REALIZADA CORRECTAMENTE" . '</div>';
+
+			//Realizamos de nuevo la consulta para que actualice la información
+			$sql = "SELECT * FROM usuarios WHERE idusuario ={$idusuario}";
+			$resultsquery = $conexion->query($sql);
+			$usuarioEditar = $resultsquery->fetch();
 		}//Si no se inserta mostrará un mensaje de error.
 	} catch (PDOException $ex) {
 		$mensajeResultado = '<div class="alert alert-danger">' . "ALGO SALIÓ MAL AL EDITAR" . '</div>';
@@ -213,12 +234,16 @@ echo $mensajeResultado;
     </br>
 
 	<!-- Imagen -->
-    <label for="image">Imagen:
-        <input type="file" name="image" class="form-control" />
-    </label>
-    </br>
+    <label for="image">Imagen de perfil: </br>
+		<?php if ($usuarioEditar["image"] != null) { ?>
+			<img src="uploads/<?php echo $usuarioEditar["image"] ?>" width="150" />
+		<?php } ?>
 
-    <input type="submit" value="Editar" name="submit" class="btn btn-success" />
+		<input type="file" name="image" class="form-control" />
+	</label>
+	</br>
+
+	<input type="submit" value="Editar" name="submit" class="btn btn-success" />
 	<a href="listuser.php" class="btn btn-danger">Volver</a>
 
 </form>
